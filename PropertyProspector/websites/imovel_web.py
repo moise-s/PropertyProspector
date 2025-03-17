@@ -85,6 +85,7 @@ class ImovelWebScraper(BaseScraper):
 
             listings.append(
                 PropertyListing(
+                    platform="imovelweb",
                     platform_id=platform_id,
                     url=full_url,
                     description=description,
