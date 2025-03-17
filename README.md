@@ -118,7 +118,7 @@ This dual-model approach ensures data integrity throughout the application.
 Run the application:
 
 ```bash
-python main.py
+uv run main.py
 ```
 
 This will:
@@ -126,6 +126,21 @@ This will:
 2. Parse the raw data into structured property listings;
 3. Store the listings in the database (`db/database.db`);
 4. Print a summary of added and updated listings;
+
+## 🧪 Testing
+
+PropertyProspector uses a comprehensive testing strategy to ensure its reliability and correctness, which includes:
+
+### Test Framework
+
+-   **pytest:** `pytest` is used, a powerful and flexible testing framework, to write and execute our tests.
+
+### How to Run Tests
+
+1. **Run all tests**:
+    ```bash
+    uv run pytest
+    ```
 
 ## 🔮 Future Improvements
 
