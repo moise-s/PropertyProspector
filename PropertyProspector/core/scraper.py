@@ -1,3 +1,4 @@
+import logging
 import os
 from abc import ABC, abstractmethod
 from typing import List
@@ -6,13 +7,14 @@ from sqlalchemy import create_engine
 from PropertyProspector.models.models import PropertyListing
 from PropertyProspector.core.database import Listing, Base
 
+_logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
+
 DATABASE_PATH = "db/database.db"
 os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
-
 engine = create_engine(f"sqlite:///{DATABASE_PATH}")
-
 Session = sessionmaker(bind=engine)
-
 # Ensure tables are created
 Base.metadata.create_all(engine)
 
@@ -55,9 +57,8 @@ class BaseScraper(ABC):
 
         session.commit()
         session.close()
-
-        print(f"{added_count} items added.")
-        print(f"{edited_count} items edited.")
+        _logger.info(f"{added_count} items added.")
+        _logger.info(f"{edited_count} items edited.")
 
     async def run(self):
         raw_data = await self.scrape()
