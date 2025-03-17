@@ -5,6 +5,7 @@ from decimal import Decimal
 
 
 class PropertyListing(BaseModel):
+    platform: str
     platform_id: str
     description: str
     price: Optional[Decimal]
