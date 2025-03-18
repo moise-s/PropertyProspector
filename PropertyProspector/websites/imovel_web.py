@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import List
 from bs4 import BeautifulSoup
 from PropertyProspector.core.scraper import BaseScraper
-from PropertyProspector.models.models import PropertyListing
+from PropertyProspector.models.models import PropertyListing, ScrapeSource
 from pydoll.browser.chrome import Chrome
 
 from PropertyProspector.utils.parser import extract_numeric_field, get_text
@@ -85,7 +85,7 @@ class ImovelWebScraper(BaseScraper):
 
             listings.append(
                 PropertyListing(
-                    platform="imovelweb",
+                    platform=ScrapeSource.IMOVELWEB,
                     platform_id=platform_id,
                     url=full_url,
                     description=description,

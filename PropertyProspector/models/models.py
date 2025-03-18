@@ -1,3 +1,4 @@
+from enum import Enum
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime, timedelta, timezone
@@ -17,3 +18,7 @@ class PropertyListing(BaseModel):
     rooms: Optional[Decimal] = None
     bathrooms: Optional[Decimal] = None
     scraped_at: datetime = datetime.now(timezone(timedelta(hours=-3)))
+
+
+class ScrapeSource(Enum):
+    IMOVELWEB = "imovelweb"
