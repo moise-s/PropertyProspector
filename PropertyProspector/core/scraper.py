@@ -1,3 +1,4 @@
+from typing import Iterator
 import logging
 import os
 from abc import ABC, abstractmethod
@@ -21,7 +22,11 @@ Base.metadata.create_all(engine)
 
 class BaseScraper(ABC):
     @abstractmethod
-    async def scrape(self) -> str:
+    def pages_to_scrape(self) -> Iterator[str]:
+        pass
+
+    @abstractmethod
+    async def scrape(self, url: str) -> str:
         pass
 
     @abstractmethod
@@ -61,6 +66,13 @@ class BaseScraper(ABC):
         _logger.info(f"{edited_count} items edited.")
 
     async def run(self):
-        raw_data = await self.scrape()
-        listings = await self.parse(raw_data)
-        self.upload(listings)
+        for url in self.pages_to_scrape():
+            _logger.info(f"Scraping URL: {url}")
+            raw_data = await self.scrape(url)
+            if not raw_data:
+                break
+            if not (listings := await self.parse(raw_data)):
+                _logger.info(f"No listings found at {url}. Ending pagination.")
+                break
+
+            self.upload(listings)
