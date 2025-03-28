@@ -1,3 +1,4 @@
+import asyncio
 from typing import Iterator
 import logging
 import os
@@ -7,6 +8,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from PropertyProspector.models.models import PropertyListing
 from PropertyProspector.core.database import Listing, Base
+from pydoll.constants import By
+from pydoll.browser.page import Page
 
 _logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -76,3 +79,21 @@ class BaseScraper(ABC):
                 break
 
             self.upload(listings)
+
+    async def is_cloudflare_blocked(self, page: Page) -> bool:
+        return bool(
+            await page.wait_element(
+                By.XPATH,
+                '//*[contains(text(), "Verify you are human")]',
+                timeout=3,
+                raise_exc=False,
+            )
+        )
+
+    async def bypass_cloudflare(self, page: Page):
+        cf_frame = await page.find_element(By.CSS_SELECTOR, "#DPxlC8 > div > div")
+        await page.execute_script(
+            'argument.style = "width: 300px; height: 65px;"', cf_frame
+        )
+        await asyncio.sleep(1)
+        await cf_frame.click()
