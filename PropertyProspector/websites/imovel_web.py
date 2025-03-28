@@ -1,20 +1,18 @@
 import logging
 import asyncio
 from decimal import Decimal
-from datetime import datetime
 from typing import Iterator, List, Optional
 from bs4 import BeautifulSoup
 from PropertyProspector.core.scraper import BaseScraper
 from PropertyProspector.models.models import PropertyListing, ScrapeSource
 from pydoll.browser.chrome import Chrome
-from pydoll.constants import By
 
 from PropertyProspector.utils.parser import extract_numeric_field, get_text
 
 _logger = logging.getLogger(__name__)
 
 # Silence INFO level logs from pydoll
-logging.getLogger('pydoll.connection.connection').setLevel(logging.WARNING)
+logging.getLogger("pydoll.connection.connection").setLevel(logging.WARNING)
 
 
 class ImovelWebScraper(BaseScraper):
@@ -37,25 +35,31 @@ class ImovelWebScraper(BaseScraper):
             page = await browser.get_page()
             await page.go_to(url)
             await page._wait_page_load()
-            page_html = await page.page_source
-
-            filename = datetime.now().strftime("%d-%m-%Y-%H:%M:%S")
-            with open(f"{filename}.html", "w", encoding="utf-8") as f:
-                f.write(page_html)
-
-            if "<title>Just a moment...<" in page_html:
-                _logger.info("Got a cloudflare, waiting for its own handling!")
-                await asyncio.sleep(5)
+            MAX_RETRIES = 5
+            for i in range(MAX_RETRIES):
                 await page._wait_page_load()
                 page_html = await page.page_source
-                if not ">Buscar imobiliárias<" in page_html:
-                    _logger.info("Couldn't bypass Cloudflare!")
-                    checkbox = await page.find_element(By.XPATH, '/html/body//div[1]')
-                    await checkbox.click()
+                if "<title>Just a moment...<" in page_html:
+                    _logger.info(
+                        f"Got a cloudflare, attempt {i + 1}/{MAX_RETRIES}, waiting for its own handling!"
+                    )
                     await asyncio.sleep(5)
                     await page._wait_page_load()
-                with open(f"{filename}.html", "w", encoding="utf-8") as f:
-                    f.write(page_html)
+                    page_html = await page.page_source
+                    if await self.is_cloudflare_blocked(page):
+                        await self.bypass_cloudflare(page)
+                        await asyncio.sleep(5)
+                        continue
+                    else:
+                        break
+                else:
+                    break
+            await page._wait_page_load()
+            if "<title>Just a moment...<" in page_html:
+                _logger.error(
+                    f"Failed to bypass Cloudflare after {MAX_RETRIES} attempts for URL: {url}"
+                )
+                return None
             if (
                 "Neste momento não temos imóveis com o perfil que está procurando"
                 in page_html
