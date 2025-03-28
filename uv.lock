@@ -327,7 +327,7 @@ requires-dist = [
     { name = "asyncio", specifier = ">=3.4.3" },
     { name = "beautifulsoup4", specifier = ">=4.13.3" },
     { name = "pydantic", specifier = ">=2.10.6" },
-    { name = "pydoll-python", specifier = ">=1.3.2" },
+    { name = "pydoll-python", specifier = ">=1.5.0" },
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "pytest-asyncio", specifier = ">=0.25.3" },
     { name = "pytest-snapshot", specifier = ">=0.9.0" },
@@ -376,7 +376,7 @@ wheels = [
 
 [[package]]
 name = "pydoll-python"
-version = "1.3.2"
+version = "1.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
@@ -385,9 +385,9 @@ dependencies = [
     { name = "requests" },
     { name = "websockets" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cc/19/2c767b365ddf567453da98db485d81a69324509b58cb390148149bcf1e9f/pydoll_python-1.3.2.tar.gz", hash = "sha256:93c1a7db26f9847d2a0a04b246d658566ae18c2d549c27e68cacb83960b8c298", size = 56000 }
+sdist = { url = "https://files.pythonhosted.org/packages/32/5c/997e9162a4529002304e9ba88c0cee154b5c4d940837d848a42240f01c64/pydoll_python-1.5.0.tar.gz", hash = "sha256:c402321822e32f1cbd94d160ced5fb90349a1b2603f662f209c5392fb447226e", size = 56215 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ed/0c/73f02e3a3821b299564a9c464e0e2aa37ab8779a913d687f6edbadc2c6a2/pydoll_python-1.3.2-py3-none-any.whl", hash = "sha256:db09bf25527eccfae8a0e3677ef2da2b6684a200ca32d0e300e8b0940c73c456", size = 60791 },
+    { url = "https://files.pythonhosted.org/packages/17/39/1538ce1052dbb5aca8beada2468aa9abb59293a8cce11059c0b1ee3760b9/pydoll_python-1.5.0-py3-none-any.whl", hash = "sha256:cab43dd8b00d88a158e3131cca53f4c137c82b26ad280adcf28649b53d19154a", size = 64749 },
 ]
 
 [[package]]
