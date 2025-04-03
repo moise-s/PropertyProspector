@@ -22,3 +22,4 @@ class PropertyListing(BaseModel):
 
 class ScrapeSource(Enum):
     IMOVELWEB = "imovelweb"
+    ZAP_IMOVEIS = "zap_imoveis"

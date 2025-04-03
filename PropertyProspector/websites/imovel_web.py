@@ -7,7 +7,7 @@ from PropertyProspector.core.scraper import BaseScraper
 from PropertyProspector.models.models import PropertyListing, ScrapeSource
 from pydoll.browser.chrome import Chrome
 
-from PropertyProspector.utils.parser import extract_numeric_field, get_text
+from PropertyProspector.utils.parser import extract_numeric_field, get_clean_text
 
 _logger = logging.getLogger(__name__)
 
@@ -104,8 +104,10 @@ class ImovelWebScraper(BaseScraper):
                 default=None,
             )
 
-            location = get_text(card.find("h2", {"data-qa": "POSTING_CARD_LOCATION"}))
-            address = get_text(
+            location = get_clean_text(
+                card.find("h2", {"data-qa": "POSTING_CARD_LOCATION"})
+            )
+            address = get_clean_text(
                 card.find(
                     "div", class_="postingLocations-module__location-address-in-listing"
                 )
@@ -114,7 +116,7 @@ class ImovelWebScraper(BaseScraper):
             rooms = extract_numeric_field(card, "span", r"(\d+) quartos", int)
             bathrooms = extract_numeric_field(card, "span", r"(\d+) ban", int)
             description = (
-                get_text(card.find("h3", {"data-qa": "POSTING_CARD_DESCRIPTION"}))
+                get_clean_text(card.find("h3", {"data-qa": "POSTING_CARD_DESCRIPTION"}))
                 or "No description available."
             )
 
