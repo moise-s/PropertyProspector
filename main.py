@@ -1,10 +1,12 @@
 import asyncio
 from PropertyProspector.websites.imovel_web import ImovelWebScraper
+from PropertyProspector.websites.zap_imoveis import ZapImoveisScraper
 
 
 async def main():
     scrapers = [
         ImovelWebScraper(),
+        ZapImoveisScraper(),
     ]
 
     # Run all scraper tasks concurrently.
