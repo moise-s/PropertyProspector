@@ -5,7 +5,7 @@ import os
 from abc import ABC, abstractmethod
 from typing import List
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, and_
 from PropertyProspector.models.models import PropertyListing
 from PropertyProspector.core.database import Listing, Base
 from pydoll.constants import By
@@ -53,7 +53,12 @@ class BaseScraper(ABC):
         for listing in listings:
             existing_listing = (
                 session.query(Listing)
-                .filter_by(property_id=listing.property_id)
+                .filter(
+                    and_(
+                        Listing.property_id == listing.property_id,
+                        Listing.platform == listing.platform
+                    )
+                )
                 .first()
             )
             if existing_listing:
