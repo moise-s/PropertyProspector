@@ -2,7 +2,7 @@ import os
 import json
 import pytest
 from datetime import datetime
-from PropertyProspector.websites.imovel_web import ImovelWebScraper
+from PropertyProspector.websites.zap_imoveis import ZapImoveisScraper
 
 
 def load_html(filename: str) -> str:
@@ -14,8 +14,8 @@ def load_html(filename: str) -> str:
 
 @pytest.mark.asyncio
 async def test_parser(snapshot):
-    html = load_html("imovel_web.html")
-    listings = await ImovelWebScraper().parse(html)
+    html = load_html("zap_imoveis.html")
+    listings = await ZapImoveisScraper().parse(html)
 
     for listing in listings:
         listing.scraped_at = datetime(2025, 1, 1)
@@ -27,5 +27,5 @@ async def test_parser(snapshot):
             indent=2,
             ensure_ascii=False,
         ),
-        "imovel_web.json",
+        "zap_imoveis.json",
     )
