@@ -10,14 +10,22 @@ from PropertyProspector.models.models import PropertyListing
 from PropertyProspector.core.database import Listing, Base
 from pydoll.constants import By
 from pydoll.browser.page import Page
+from dotenv import load_dotenv
 
 _logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
+load_dotenv()
 
-DATABASE_PATH = "db/database.db"
-os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
-engine = create_engine(f"sqlite:///{DATABASE_PATH}")
+# Database Configuration (PostgreSQL)
+DATABASE_USER = os.getenv("POSTGRES_USER")
+DATABASE_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+DATABASE_HOST = os.getenv("POSTGRES_HOST")
+DATABASE_PORT = os.getenv("POSTGRES_PORT")
+DATABASE_NAME = os.getenv("POSTGRES_DB")
+
+DATABASE_URL = f"postgresql://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
+engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
 # Ensure tables are created
 Base.metadata.create_all(engine)
@@ -45,7 +53,7 @@ class BaseScraper(ABC):
         for listing in listings:
             existing_listing = (
                 session.query(Listing)
-                .filter_by(platform_id=listing.platform_id)
+                .filter_by(property_id=listing.property_id)
                 .first()
             )
             if existing_listing:
@@ -91,7 +99,9 @@ class BaseScraper(ABC):
         )
 
     async def bypass_cloudflare(self, page: Page):
-        cf_frame = await page.find_element(By.XPATH, "/html/body/div[1]/div/div[1]/div/div")
+        cf_frame = await page.find_element(
+            By.XPATH, "/html/body/div[1]/div/div[1]/div/div"
+        )
         await page.execute_script(
             'argument.style = "width: 300px; height: 65px;"', cf_frame
         )

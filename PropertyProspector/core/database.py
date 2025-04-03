@@ -9,7 +9,7 @@ class Listing(Base):
     __tablename__ = "listings"
     id = Column(Integer, primary_key=True, autoincrement=True)
     platform = Column(String, nullable=False)
-    platform_id = Column(String, nullable=False)
+    property_id = Column(String, nullable=False)
     description = Column(String, nullable=False)
     price = Column(Numeric(precision=12, scale=2), nullable=True)
     condo_fee = Column(Numeric(precision=12, scale=2), nullable=True)

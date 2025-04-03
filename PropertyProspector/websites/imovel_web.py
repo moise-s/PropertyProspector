@@ -78,7 +78,7 @@ class ImovelWebScraper(BaseScraper):
             layout = card.find(
                 "div", class_="postingCardLayout-module__posting-card-layout"
             )
-            platform_id = layout.get("data-id")
+            property_id = layout.get("data-id")
             url_suffix = layout.get("data-to-posting", "")
             full_url = f"{base_url}{url_suffix}"
 
@@ -121,7 +121,7 @@ class ImovelWebScraper(BaseScraper):
             listings.append(
                 PropertyListing(
                     platform=ScrapeSource.IMOVELWEB,
-                    platform_id=platform_id,
+                    property_id=property_id,
                     url=full_url,
                     description=description,
                     price=price,
