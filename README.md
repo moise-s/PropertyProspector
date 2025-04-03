@@ -24,11 +24,18 @@ PropertyProspector is a real estate data collection and designed to help you fin
 
 ## ✨ Features
 
-- **Asynchronous Web Scraping**: Efficiently scrapes property listings using asynchronous programming;
-- **Modular Architecture**: Easily extendable to support additional real estate websites;
-- **Persistent Storage**: Stores all property data in a SQLite database;
-- **Data Deduplication**: Updates existing listings and adds new ones;
-- **Structured Data Model**: Consistent property representation across different sources;
+*   **Multi-Site Scraping:** Currently supports scraping from:
+    *   [Zap Imóveis](https://www.zapimoveis.com.br/)
+    *   [ImovelWeb](https://www.imovelweb.com.br/)
+*   **Data Storage:** Stores scraped data in a PostgreSQL database.
+*   **Cloudflare Bypass:** Implements a mechanism to bypass Cloudflare's "Verify you are human" checks.
+*   **Asynchronous Operations:** Uses `asyncio` for efficient concurrent scraping.
+*   **Data Parsing:** Extracts relevant information from HTML using `BeautifulSoup`.
+*   **Data Model:** Uses `pydantic` models to structure and validate scraped data.
+*   **Extensible:** Designed with an abstract base class (`BaseScraper`) to easily add support for new websites.
+* **Pagination Handling:** Automatically navigates through multiple pages of listings on each website.
+* **Scroll Handling:** Implements a scroll-based mechanism to load all listings on a page, especially useful for sites with infinite scrolling.
+* **Data Update:** The scraper is able to identify and update existing listings in the database if the data has changed.
 
 ## 🏗️ Architecture
 
@@ -41,11 +48,18 @@ The `BaseScraper` abstract class is the foundation of PropertyProspector's scrap
 ```python
 class BaseScraper(ABC):
     @abstractmethod
+    def pages_to_scrape(self) -> Iterator[str]:
+        # Implementation for pagination operations
+        pass
+
+    @abstractmethod
     async def scrape(self) -> str:
+        # Implementation for scraping operations
         pass
 
     @abstractmethod
     async def parse(self, raw_data: str) -> List[PropertyListing]:
+        # Implementation for parsing operations
         pass
 
     def upload(self, listings: List[PropertyListing]) -> None:
@@ -53,9 +67,10 @@ class BaseScraper(ABC):
         pass
 
     async def run(self):
-        raw_data = await self.scrape()
-        listings = await self.parse(raw_data)
-        self.upload(listings)
+        for url in self.pages_to_scrape():
+            raw_data = await self.scrape(url)
+            listings = await self.parse(raw_data)
+            self.upload(listings)
 ```
 
 This design is crucial for several reasons:
@@ -73,7 +88,8 @@ The main application uses `asyncio` to run all scrapers concurrently:
 async def main():
     scrapers = [
         ImovelWebScraper(),
-        # Future scrapers will be added here
+        ZapImoveisScraper(),
+        # Add more scrapers here...
     ]
 
     # Run all scraper tasks concurrently
@@ -95,8 +111,15 @@ This dual-model approach ensures data integrity throughout the application.
 
 ### Prerequisites
 
-- Python 3.13 or higher
-- [uv](https://github.com/astral-sh/uv) - A fast Python package installer and resolver
+- Python 3.13 or higher;
+- [uv](https://github.com/astral-sh/uv) - A fast Python package installer and resolver;
+-   **PostgreSQL Database:** You'll need a running PostgreSQL instance.
+-   **Environment Variables:** Set the following environment variables:
+    *   `POSTGRES_USER`: Your PostgreSQL username;
+    *   `POSTGRES_PASSWORD`: Your PostgreSQL password;
+    *   `POSTGRES_HOST`: Your PostgreSQL host (e.g., `localhost`);
+    *   `POSTGRES_PORT`: Your PostgreSQL port (e.g., `5432`);
+    *   `POSTGRES_DB`: Your PostgreSQL database name.
 
 ### Setup
 
@@ -124,7 +147,7 @@ uv run main.py
 This will:
 1. Scrape property listings from configured websites;
 2. Parse the raw data into structured property listings;
-3. Store the listings in the database (`db/database.db`);
+3. Store the listings in the Postgres database;
 4. Print a summary of added and updated listings;
 
 ## 🧪 Testing
@@ -144,8 +167,8 @@ PropertyProspector uses a comprehensive testing strategy to ensure its reliabili
 
 ## 🔮 Future Improvements
 
+- **Filters**: Support filters to scrape data accordingly;
 - **Additional Websites**: Support for more real estate websites will be added;
-- **Pagination Support**: ImovelWeb scraper will be enhanced to scrape all pages of results (currently only scrapes the first page);
 - **Price Change Tracking**: Explicit tracking of properties with price changes;
 - **Data Analytics**: Advanced filtering and recommendation features;
 - **User Interface**: Web or desktop interface for easier interaction;
