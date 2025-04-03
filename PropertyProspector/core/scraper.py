@@ -91,7 +91,7 @@ class BaseScraper(ABC):
         )
 
     async def bypass_cloudflare(self, page: Page):
-        cf_frame = await page.find_element(By.CSS_SELECTOR, "#DPxlC8 > div > div")
+        cf_frame = await page.find_element(By.XPATH, "/html/body/div[1]/div/div[1]/div/div")
         await page.execute_script(
             'argument.style = "width: 300px; height: 65px;"', cf_frame
         )
